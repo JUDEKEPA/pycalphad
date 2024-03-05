@@ -92,14 +92,14 @@ def _sample_phase_constitution(model, sampler, fixed_grid, pdens):
     # Eliminate pure vacancy endmembers from the calculation
     ALLOWED_CHARGE=1E-10
     vacancy_indices = []
-    for sublattice in model.constituents:
+    for sublattice in model.constituents:  # find if vacancy in each sublattice
         subl_va_indices = [idx for idx, spec in enumerate(sorted(set(sublattice))) if spec.number_of_atoms == 0]
         vacancy_indices.append(subl_va_indices)
     if len(vacancy_indices) != len(model.constituents):
         vacancy_indices = None
-    sublattice_dof = [len(subl) for subl in model.constituents]
+    sublattice_dof = [len(subl) for subl in model.constituents]  # how many components are changeable in each sublattice
     # Add all endmembers to guarantee their presence
-    points = endmember_matrix(sublattice_dof, vacancy_indices=vacancy_indices)
+    points = endmember_matrix(sublattice_dof, vacancy_indices=vacancy_indices)  # set endmembers in points
     site_ratios = model.site_ratios
     constant_site_ratios = True
     # The only implementation with variable site ratios is the two-sublattice ionic liquid.
@@ -150,13 +150,15 @@ def _sample_phase_constitution(model, sampler, fixed_grid, pdens):
     if (fixed_grid is True) and not linearly_constrained_space:
         # Sample along the edges of the endmembers
         # These constitution space edges are often the equilibrium points!
-        em_pairs = list(itertools.combinations(points, 2))[:MAX_ENDMEMBER_PAIRS]
+        em_pairs = list(itertools.combinations(points, 2))[:MAX_ENDMEMBER_PAIRS]  # Combination of each two endmembers
         if len(em_pairs) > 0:
-            lingrid = np.linspace(0, 1, int(min(pdens, MAX_EXTRA_POINTS/len(em_pairs))))
+
+            lingrid = np.linspace(0, 1, int(min(pdens, MAX_EXTRA_POINTS/len(em_pairs))))  # According to density generate auxiliary grid
             extra_points = [first_em * lingrid[np.newaxis].T +
                             second_em * lingrid[::-1][np.newaxis].T
-                            for first_em, second_em in em_pairs]
-            points = np.concatenate(list(itertools.chain([points], extra_points)))
+                            for first_em, second_em in em_pairs]  # link each pair of endmembers
+            # points = np.concatenate(list(itertools.chain([points], extra_points)))
+            points = np.concatenate(extra_points)
     # Sample composition space for more points
     if sum(sublattice_dof) > len(sublattice_dof):
         if linearly_constrained_space:
