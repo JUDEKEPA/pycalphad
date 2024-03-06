@@ -189,11 +189,11 @@ def _sample_phase_constitution(model, sampler, fixed_grid, pdens):
             if points.shape[0] == 0:
                 warnings.warn(f'{model.phase_name} has zero feasible configurations under the given conditions')
         else:
-            points = np.concatenate((points, sampler(sublattice_dof, pdof=pdens)))
+            points = np.concatenate((points, sampler(sublattice_dof, pdof=pdens)))  # random components generation
 
     # Filter out nan's that may have slipped in if we sampled too high a vacancy concentration
     # Issues with this appear to be platform-dependent
-    points = points[~np.isnan(points).any(axis=-1)]
+    points = points[~np.isnan(points).any(axis=-1)]  # .any(axis=-1) along column check each row
     # Ensure that points has the correct dimensions and dtype
     points = np.atleast_2d(np.asarray(points, dtype=np.float_))
     return points

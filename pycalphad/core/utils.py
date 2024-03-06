@@ -47,7 +47,7 @@ def point_sample(comp_count, pdof=10):
                  pdof * (sum(comp_count) - len(comp_count)), scramble=True)
     # Convert low-discrepancy sequence to normalized exponential
     # This will be uniformly distributed over the simplices
-    pts = -np.log(pts)
+    pts = -np.log(pts)  # Dirichlet distribution
     cur_idx = 0
     for ctx in comp_count:
         end_idx = cur_idx + ctx
